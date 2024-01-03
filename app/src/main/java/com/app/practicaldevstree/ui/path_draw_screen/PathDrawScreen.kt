@@ -12,6 +12,7 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.android.gms.maps.model.MarkerOptions
@@ -23,7 +24,7 @@ class PathDrawScreen : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var binding: ActivityPathDrawScreenBinding
     private lateinit var mMap: GoogleMap
     private var isMapReady = false
-    private var locationList: ArrayList<PlaceEntity>?=null
+    private var locationList: ArrayList<PlaceEntity>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,7 +39,7 @@ class PathDrawScreen : AppCompatActivity(), OnMapReadyCallback {
         setToolBarData()
         onClick()
 
-         locationList =
+        locationList =
             intent.getParcelableArrayListExtra(locationListKey)
         if (locationList != null && locationList!!.size >= 4) {
             if (isMapReady) {
@@ -86,7 +87,10 @@ class PathDrawScreen : AppCompatActivity(), OnMapReadyCallback {
         mMap.clear()
 
         if (locationList.size >= 2) {
-            addMarker(LatLng(locationList[0].latitude, locationList[0].longitude), locationList[0].name)
+            addMarker(
+                LatLng(locationList[0].latitude, locationList[0].longitude),
+                locationList[0].name, BitmapDescriptorFactory.HUE_GREEN
+            )
 
             for (i in 0 until locationList.size - 1) {
                 val currentLatLng = LatLng(locationList[i].latitude, locationList[i].longitude)
@@ -98,13 +102,13 @@ class PathDrawScreen : AppCompatActivity(), OnMapReadyCallback {
                     locationList[i].latitude != locationList[i + 1].latitude ||
                     locationList[i].longitude != locationList[i + 1].longitude
                 ) {
-                    addMarker(nextLatLng, locationList[i].name)
+                    addMarker(nextLatLng, locationList[i].name, BitmapDescriptorFactory.HUE_BLUE)
                 }
             }
 
             addMarker(
                 LatLng(locationList.last().latitude, locationList.last().longitude),
-                locationList.last().name
+                locationList.last().name, BitmapDescriptorFactory.HUE_RED
             )
         }
 
@@ -113,8 +117,11 @@ class PathDrawScreen : AppCompatActivity(), OnMapReadyCallback {
         }
     }
 
-    private fun addMarker(latLng: LatLng, title: String) {
-        mMap.addMarker(MarkerOptions().position(latLng).title(title))
+    private fun addMarker(latLng: LatLng, title: String, color: Float) {
+        mMap.addMarker(
+            MarkerOptions().position(latLng).title(title)
+                .icon(BitmapDescriptorFactory.defaultMarker(color))
+        )
     }
 
     private fun adjustCamera(locationList: List<PlaceEntity>) {
@@ -122,10 +129,18 @@ class PathDrawScreen : AppCompatActivity(), OnMapReadyCallback {
         for (location in locationList) {
             boundsBuilder.include(LatLng(location.latitude, location.longitude))
         }
-        val bounds = boundsBuilder.build()
+        /*val bounds = boundsBuilder.build()
         val padding = 100
-        val cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, padding)
-        mMap.moveCamera(cameraUpdate)
+        *//*val cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, padding)
+        mMap.moveCamera(cameraUpdate)*/
+        mMap.animateCamera(
+            CameraUpdateFactory.newLatLngZoom(
+                LatLng(
+                    locationList[0].latitude,
+                    locationList[0].longitude
+                ), 10f
+            )
+        )
     }
 
 }

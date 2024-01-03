@@ -39,7 +39,8 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
     private var placeName: String = ""
     private var placeAddress: String = ""
     private val locationViewModel: LocationViewModel by viewModels()
-    private var placeEntity: PlaceEntity?=null
+    private var placeEntity: PlaceEntity? = null
+    private var isLocationModified = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -87,8 +88,13 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
                 placeEntity!!.latitude = latlng.latitude
                 placeEntity!!.longitude = latlng.longitude
 
-                lifecycleScope.launch {
-                    locationViewModel.updateLocation(placeEntity!!)
+                if (isLocationModified) {
+                    lifecycleScope.launch {
+                        locationViewModel.updateLocation(placeEntity!!)
+                        val intent = Intent(this@MapScreen, MapListScreen::class.java)
+                        startActivity(intent)
+                    }
+                } else {
                     val intent = Intent(this@MapScreen, MapListScreen::class.java)
                     startActivity(intent)
                 }
@@ -147,6 +153,7 @@ class MapScreen : AppCompatActivity(), OnMapReadyCallback {
                         placeName = place.name!!
                         placeAddress = place.address!!
                         addMarker(latlng, place.name!!)
+                        isLocationModified = true
                     }
                     binding.etAddress.setText(place.address!!.toString())
                 }

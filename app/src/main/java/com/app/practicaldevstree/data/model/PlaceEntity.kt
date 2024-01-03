@@ -13,5 +13,6 @@ data class PlaceEntity(
     var name: String,
     var address: String,
     var latitude: Double,
-    var longitude: Double
+    var longitude: Double,
+    var distance: Double = 0.0
 ) : Parcelable

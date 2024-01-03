@@ -1,25 +1,30 @@
 package com.app.practicaldevstree.ui.map_list_screen
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
-import androidx.lifecycle.Observer
 import androidx.lifecycle.lifecycleScope
+import com.app.practicaldevstree.R
 import com.app.practicaldevstree.adapter.LocationAdapter
 import com.app.practicaldevstree.adapter.onClickDeleteListener
 import com.app.practicaldevstree.adapter.onClickEditListener
 import com.app.practicaldevstree.data.model.PlaceEntity
 import com.app.practicaldevstree.databinding.ActivityMapListScreenBinding
+import com.app.practicaldevstree.databinding.BottomSheetSortBinding
 import com.app.practicaldevstree.ui.map_screen.MapScreen
 import com.app.practicaldevstree.ui.path_draw_screen.PathDrawScreen
+import com.app.practicaldevstree.utils.calculateDistanceInKm
 import com.app.practicaldevstree.utils.locationDataKey
 import com.app.practicaldevstree.utils.locationListKey
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
 
@@ -50,6 +55,10 @@ class MapListScreen : AppCompatActivity() {
                 binding.btnAddPlace.isVisible = false
                 binding.rvLocation.isVisible = true
                 binding.btnDuAddPlace.isVisible = true
+
+                if (it.size >= 2) {
+                    calculateDistancesFromFirstLocation(it)
+                }
                 Log.e(javaClass.simpleName, "setUpObserver: ${ArrayList(it)}")
                 if (it.size >= 4) {
                     binding.btnDirection.visibility = View.VISIBLE
@@ -57,7 +66,28 @@ class MapListScreen : AppCompatActivity() {
                     binding.btnDirection.visibility = View.GONE
                 }
                 adapter!!.updateList(ArrayList(it))
+                /**
+                 * keep original list
+                 **/
+                adapter!!.updateOriginalList(ArrayList(it))
             }
+        }
+    }
+
+    private fun calculateDistancesFromFirstLocation(locationList: List<PlaceEntity>) {
+        if (locationList.size >= 2) {
+            val firstLocation = locationList[0]
+
+            for (i in 1 until locationList.size) {
+                val currentLocation = locationList[i]
+                val distance = calculateDistanceInKm(
+                    firstLocation.latitude, firstLocation.longitude,
+                    currentLocation.latitude, currentLocation.longitude
+                )
+                currentLocation.distance = distance
+            }
+
+            adapter?.updateList(ArrayList(locationList))
         }
     }
 
@@ -71,19 +101,23 @@ class MapListScreen : AppCompatActivity() {
     }
 
     private fun setAdapter() {
-        adapter = LocationAdapter(arrayListOf(), listenerEdit = object : onClickEditListener {
-            override fun onClickEdit(model: PlaceEntity) {
-                val intent = Intent(this@MapListScreen, MapScreen::class.java)
-                intent.putExtra(locationDataKey, model)
-                startActivity(intent)
-            }
+        adapter = LocationAdapter(
+            arrayListOf(),
+            arrayListOf(),
+            listenerEdit = object : onClickEditListener {
+                override fun onClickEdit(model: PlaceEntity) {
+                    val intent = Intent(this@MapListScreen, MapScreen::class.java)
+                    intent.putExtra(locationDataKey, model)
+                    startActivity(intent)
+                }
 
-        }, listenerDelete = object : onClickDeleteListener {
-            override fun onClickDelete(model : PlaceEntity) {
-                dialogForDeleteLocation(model)
-            }
+            },
+            listenerDelete = object : onClickDeleteListener {
+                override fun onClickDelete(model: PlaceEntity) {
+                    dialogForDeleteLocation(model)
+                }
 
-        })
+            })
         binding.rvLocation.adapter = adapter
     }
 
@@ -110,8 +144,8 @@ class MapListScreen : AppCompatActivity() {
 
     private fun dialogForDeleteLocation(removeLocationData: PlaceEntity) {
         val alertDialogBuilder = AlertDialog.Builder(this@MapListScreen)
-        alertDialogBuilder.setTitle("Delete Location")
-        alertDialogBuilder.setMessage("Are you sure you want to delete this location?")
+        alertDialogBuilder.setTitle(getString(R.string.title_delete_location))
+        alertDialogBuilder.setMessage(getString(R.string.title_are_you_sure_you_want_to_delete_this_location))
         alertDialogBuilder.setCancelable(false)
         alertDialogBuilder.setPositiveButton("Yes") { _, _ ->
             lifecycleScope.launch {
@@ -128,8 +162,52 @@ class MapListScreen : AppCompatActivity() {
 
     private fun setToolbarData() {
         setSupportActionBar(binding.toolbar)
-//        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowHomeEnabled(true)
-        supportActionBar?.title = "Location Source"
+        supportActionBar?.title = getString(R.string.label_location_source)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_item, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.img_location -> {
+                showBottomSheet()
+                Log.e(javaClass.simpleName, "onOptionsItemSelected: ")
+                true
+            }
+
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun showBottomSheet() {
+        Log.e(javaClass.simpleName, "showBottomSheet: ")
+        val bottomSheetBinding = BottomSheetSortBinding.inflate(layoutInflater)
+        val bottomSheetDialog = BottomSheetDialog(this)
+        bottomSheetDialog.setContentView(bottomSheetBinding.root)
+        bottomSheetDialog.setCancelable(false)
+        bottomSheetBinding.btnApplySort.setOnClickListener {
+            bottomSheetBinding.btnApplySort.setOnClickListener {
+                when (bottomSheetBinding.radioGroup.checkedRadioButtonId) {
+                    R.id.radioAsc -> adapter?.sortByAscending()
+                    R.id.radioDesc -> adapter?.sortByDescending()
+                }
+                bottomSheetDialog.dismiss()
+            }
+        }
+
+        bottomSheetBinding.imgClose.setOnClickListener {
+            bottomSheetDialog.dismiss()
+        }
+
+        bottomSheetBinding.btnClear.setOnClickListener {
+            adapter?.clearSort()
+            bottomSheetDialog.dismiss()
+        }
+
+        bottomSheetDialog.show()
     }
 }
