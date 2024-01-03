@@ -43,6 +43,8 @@ class MapListScreen : AppCompatActivity() {
             if (it.isEmpty()) {
                 binding.txtNoPlace.isVisible = true
                 binding.btnAddPlace.isVisible = true
+                binding.rvLocation.isGone = true
+                binding.btnDuAddPlace.isGone = true
             } else {
                 binding.txtNoPlace.isVisible = false
                 binding.btnAddPlace.isVisible = false
