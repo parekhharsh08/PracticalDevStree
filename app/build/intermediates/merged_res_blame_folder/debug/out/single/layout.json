@@ -1,0 +1,22 @@
+[
+    {
+        "merged": "com.app.practicaldevstree.app-mergeDebugResources-43:/layout/activity_path_draw_screen.xml",
+        "source": "com.app.practicaldevstree.app-main-46:/layout/activity_path_draw_screen.xml"
+    },
+    {
+        "merged": "com.app.practicaldevstree.app-mergeDebugResources-43:/layout/activity_map_list_screen.xml",
+        "source": "com.app.practicaldevstree.app-main-46:/layout/activity_map_list_screen.xml"
+    },
+    {
+        "merged": "com.app.practicaldevstree.app-mergeDebugResources-43:/layout/dialog_location.xml",
+        "source": "com.app.practicaldevstree.app-main-46:/layout/dialog_location.xml"
+    },
+    {
+        "merged": "com.app.practicaldevstree.app-mergeDebugResources-43:/layout/row_location_list.xml",
+        "source": "com.app.practicaldevstree.app-main-46:/layout/row_location_list.xml"
+    },
+    {
+        "merged": "com.app.practicaldevstree.app-mergeDebugResources-43:/layout/activity_map_screen.xml",
+        "source": "com.app.practicaldevstree.app-main-46:/layout/activity_map_screen.xml"
+    }
+]

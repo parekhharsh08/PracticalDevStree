@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">PracticalDevStree</string>
+    <string name="google_map_key">AIzaSyBSNyp6GQnnKlrMr7hD2HGiyF365tFlK5U</string>
+    <string name="label_no_place_available">No place Available.\n Let\'s start by adding few places</string>
+    <string name="label_add_poi">Add POI</string>
+    <string name="label_enter_address">Search Address ex..Ahmedabad</string>
+    <string name="label_do_you_want_to_save_this_selected_location">Do you want to save this selected location?</string>
+    <string name="label_save">Save</string>
+    <string name="label_update">Update</string>
+</resources>

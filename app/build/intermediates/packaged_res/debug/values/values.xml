@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="blue">#0A1F93</color>
+    <color name="gray">#4C4D50</color>
+    <color name="transparent">#80000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <string name="app_name">PracticalDevStree</string>
+    <string name="google_map_key">AIzaSyBSNyp6GQnnKlrMr7hD2HGiyF365tFlK5U</string>
+    <string name="label_add_poi">Add POI</string>
+    <string name="label_do_you_want_to_save_this_selected_location">Do you want to save this selected location?</string>
+    <string name="label_enter_address">Search Address ex..Ahmedabad</string>
+    <string name="label_no_place_available">No place Available.\n Let\'s start by adding few places</string>
+    <string name="label_save">Save</string>
+    <string name="label_update">Update</string>
+    <style name="Base.Theme.PracticalDevStree" parent="Theme.Material3.Light.NoActionBar">
+        
+         <item name="colorPrimary">@color/blue</item>
+    </style>
+    <style name="Theme.PracticalDevStree" parent="Base.Theme.PracticalDevStree"/>
+</resources>
